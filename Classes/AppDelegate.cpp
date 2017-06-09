@@ -1,13 +1,16 @@
 #include "AppDelegate.h"
 #include "HelloWorldScene.h"
+#include "ColorPattern.h"
 
 USING_NS_CC;
 
-AppDelegate::AppDelegate() {
+static cocos2d::Size designResolutionSize = cocos2d::Size(1280, 768);
 
+AppDelegate::AppDelegate() {
+    
 }
 
-AppDelegate::~AppDelegate() 
+AppDelegate::~AppDelegate()
 {
 }
 
@@ -18,42 +21,64 @@ void AppDelegate::initGLContextAttrs()
     //set OpenGL context attributions,now can only set six attributions:
     //red,green,blue,alpha,depth,stencil
     GLContextAttrs glContextAttrs = {8, 8, 8, 8, 24, 8};
-
+    
     GLView::setGLContextAttrs(glContextAttrs);
+}
+
+// If you want to use packages manager to install more packages,
+// don't modify or remove this function
+static int register_all_packages()
+{
+    return 0; //flag for packages manager
 }
 
 bool AppDelegate::applicationDidFinishLaunching() {
     // initialize director
+    
     auto director = Director::getInstance();
     auto glview = director->getOpenGLView();
     if(!glview) {
-        glview = GLViewImpl::createWithRect("LearnColoring", Rect(0, 0, 960, 640));
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_WIN32) || (CC_TARGET_PLATFORM == CC_PLATFORM_MAC) || (CC_TARGET_PLATFORM == CC_PLATFORM_LINUX)
+        glview = GLViewImpl::createWithRect("Learn Coloring", Rect(0, 0, 1280, 768));
+#else
+        glview = GLViewImpl::create("Learn Coloring");
+#endif
         director->setOpenGLView(glview);
     }
-
-    director->getOpenGLView()->setDesignResolutionSize(960, 640, ResolutionPolicy::SHOW_ALL);
-
+    
     // turn on display FPS
-    director->setDisplayStats(true);
-
+    director->setDisplayStats(false);
+    
     // set FPS. the default value is 1.0/60 if you don't call this
     director->setAnimationInterval(1.0 / 60);
-
-    FileUtils::getInstance()->addSearchPath("res");
-
+    
+    // Set the design resolution
+    glview->setDesignResolutionSize(designResolutionSize.width, designResolutionSize.height, ResolutionPolicy::NO_BORDER);
+    Size frameSize = glview->getFrameSize();
+    if (frameSize.height / designResolutionSize.height < frameSize.width / designResolutionSize.width) {
+        glview->setDesignResolutionSize(designResolutionSize.width, designResolutionSize.height, ResolutionPolicy::FIXED_HEIGHT);
+    }
+    else {
+        glview->setDesignResolutionSize(designResolutionSize.width, designResolutionSize.height, ResolutionPolicy::FIXED_WIDTH);
+    }
+    
+    register_all_packages();
+    
     // create a scene. it's an autorelease object
-    auto scene = HelloWorld::createScene();
-
+    //auto scene = Splash::createScene();
+    //auto scene = HelloWorld::createScene();
+    auto scene = ColorPattern::createScene();
+    
     // run
     director->runWithScene(scene);
-
+    
     return true;
 }
 
 // This function will be called when the app is inactive. When comes a phone call,it's be invoked too
 void AppDelegate::applicationDidEnterBackground() {
     Director::getInstance()->stopAnimation();
-
+    
     // if you use SimpleAudioEngine, it must be pause
     // SimpleAudioEngine::getInstance()->pauseBackgroundMusic();
 }
@@ -61,7 +86,7 @@ void AppDelegate::applicationDidEnterBackground() {
 // this function will be called when the app is active again
 void AppDelegate::applicationWillEnterForeground() {
     Director::getInstance()->startAnimation();
-
+    
     // if you use SimpleAudioEngine, it must resume here
     // SimpleAudioEngine::getInstance()->resumeBackgroundMusic();
 }

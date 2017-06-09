@@ -24,8 +24,7 @@ Scene* HelloWorld::createScene()
 // on "init" you need to initialize your instance
 bool HelloWorld::init()
 {
-    /**  you can create scene with following comment code instead of using csb file.
-    // 1. super init first
+    
     if ( !Layer::init() )
     {
         return false;
@@ -33,60 +32,87 @@ bool HelloWorld::init()
     
     Size visibleSize = Director::getInstance()->getVisibleSize();
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
-
-    /////////////////////////////
-    // 2. add a menu item with "X" image, which is clicked to quit the program
-    //    you may modify it.
-
-    // add a "close" icon to exit the progress. it's an autorelease object
-    auto closeItem = MenuItemImage::create(
-                                           "CloseNormal.png",
-                                           "CloseSelected.png",
-                                           CC_CALLBACK_1(HelloWorld::menuCloseCallback, this));
     
-	closeItem->setPosition(Vec2(origin.x + visibleSize.width - closeItem->getContentSize().width/2 ,
-                                origin.y + closeItem->getContentSize().height/2));
-
-    // create menu, it's an autorelease object
-    auto menu = Menu::create(closeItem, NULL);
-    menu->setPosition(Vec2::ZERO);
-    this->addChild(menu, 1);
-
-    /////////////////////////////
-    // 3. add your codes below...
-
-    // add a label shows "Hello World"
-    // create and initialize a label
+    auto bg = Sprite::create("gambar/bgStage.png");
+    bg->setPosition(Vec2(visibleSize.width/2, visibleSize.height/2));
     
-    auto label = Label::createWithTTF("Hello World", "fonts/Marker Felt.ttf", 24);
+    auto stencil = Sprite::create("gambar/201a.png");
     
-    // position the label on the center of the screen
-    label->setPosition(Vec2(origin.x + visibleSize.width/2,
-                            origin.y + visibleSize.height - label->getContentSize().height));
-
-    // add the label as a child to this layer
-    this->addChild(label, 1);
-
-    // add "HelloWorld" splash screen"
-    auto sprite = Sprite::create("HelloWorld.png");
-
-    // position the sprite on the center of the screen
-    sprite->setPosition(Vec2(visibleSize.width/2 + origin.x, visibleSize.height/2 + origin.y));
-
-    // add the sprite as a child to this layer
-    this->addChild(sprite, 0);
-    **/
+    brush = Sprite::create("gambar/brush.png");
+    brush->setColor(Color3B(255, 0, 0));
+    brush->setScale(0.7);
+    brush->retain();
     
-    //////////////////////////////
-    // 1. super init first
-    if ( !Layer::init() )
-    {
-        return false;
+    auto apel = Sprite::create("gambar/201.png");
+    apel->setPosition(Vec2(visibleSize.width/2, visibleSize.height/2));
+    
+    auto clipper = ClippingNode::create();
+    clipper->setAnchorPoint(Vec2(0.5, 0.5));
+    clipper->setPosition(Vec2(visibleSize.width/2, visibleSize.height/2));
+    clipper->setAlphaThreshold(0.05f);
+    clipper->setStencil(stencil);
+    
+    target = RenderTexture::create(visibleSize.width, visibleSize.height, Texture2D::PixelFormat::RGBA8888);
+    target->setPosition(Vec2(clipper->getContentSize().width/2, clipper->getContentSize().height/2));
+    target->retain();
+    
+    clipper->addChild(stencil);
+    clipper->addChild(target);
+    
+    //stencil->runAction(RepeatForever::create(RotateBy::create(1.0f, 90.0f)));
+    
+    this->addChild(bg);
+    
+    this->addChild(clipper);
+    //this->addChild(target);
+    
+    auto listener = EventListenerTouchOneByOne::create();
+    listener->onTouchBegan = CC_CALLBACK_2(HelloWorld::onTouchBegan, this);
+    listener->onTouchMoved = CC_CALLBACK_2(HelloWorld::onTouchMoved, this);
+    listener->onTouchEnded = CC_CALLBACK_2(HelloWorld::onTouchEnded, this);
+    this->getEventDispatcher()->
+    addEventListenerWithSceneGraphPriority(listener, this);
+    
+    return true;
+}
+
+bool HelloWorld::onTouchBegan(cocos2d::Touch *touch, cocos2d::Event *events)
+{
+    Vec2 start = touch->getLocation();
+    
+    target->begin();
+    brush->setPosition(start);
+    brush->retain();
+    target->end();
+    
+    return true;
+}
+
+void HelloWorld::onTouchMoved(cocos2d::Touch *touch, cocos2d::Event *events)
+{
+    Vec2 end = touch->getLocation();
+    Vec2 start = touch->getPreviousLocation();
+    
+    target->begin();
+    
+    int distance = (int)start.distance(end);
+    
+    for(int i=0;i<distance;i++){
+        float difx = end.x - start.x;
+        float dify = end.y - start.y;
+        float delta = (float)i / distance;
+        
+        auto spriteframe = brush->getSpriteFrame();
+        auto b = Sprite::createWithSpriteFrame(spriteframe);
+        b->setColor(Color3B(255, 0, 0));
+        b->setPosition(Vec2(start.x + (difx * delta), start.y + (dify * delta)));
+        b->visit();
     }
     
-    auto rootNode = CSLoader::createNode("MainScene.csb");
+    target->end();
+}
 
-    addChild(rootNode);
+void HelloWorld::onTouchEnded(cocos2d::Touch *touch, cocos2d::Event *events)
+{
 
-    return true;
 }

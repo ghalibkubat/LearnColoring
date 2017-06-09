@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>IDESourceControlProjectFavoriteDictionaryKey</key>
+	<false/>
+	<key>IDESourceControlProjectIdentifier</key>
+	<string>30B20E4E-3B4D-4A3E-B51E-738D6CBCBD06</string>
+	<key>IDESourceControlProjectName</key>
+	<string>LearnColoring</string>
+	<key>IDESourceControlProjectOriginsDictionary</key>
+	<dict>
+		<key>C7E999F943D663C4264D32F186C0DCBB5F244CC3</key>
+		<string>https://github.com/ghalibkubat/LearnColoring.git</string>
+	</dict>
+	<key>IDESourceControlProjectPath</key>
+	<string>proj.ios_mac/LearnColoring.xcodeproj</string>
+	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
+	<dict>
+		<key>C7E999F943D663C4264D32F186C0DCBB5F244CC3</key>
+		<string>../../..</string>
+	</dict>
+	<key>IDESourceControlProjectURL</key>
+	<string>https://github.com/ghalibkubat/LearnColoring.git</string>
+	<key>IDESourceControlProjectVersion</key>
+	<integer>111</integer>
+	<key>IDESourceControlProjectWCCIdentifier</key>
+	<string>C7E999F943D663C4264D32F186C0DCBB5F244CC3</string>
+	<key>IDESourceControlProjectWCConfigurations</key>
+	<array>
+		<dict>
+			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
+			<string>public.vcs.git</string>
+			<key>IDESourceControlWCCIdentifierKey</key>
+			<string>C7E999F943D663C4264D32F186C0DCBB5F244CC3</string>
+			<key>IDESourceControlWCCName</key>
+			<string>LearnColoring</string>
+		</dict>
+	</array>
+</dict>
+</plist>

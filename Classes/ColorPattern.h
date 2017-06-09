@@ -1,5 +1,5 @@
-#ifndef __HELLOWORLD_SCENE_H__
-#define __HELLOWORLD_SCENE_H__
+#ifndef __COLORPATTERN_SCENE_H__
+#define __COLORPATTERN_SCENE_H__
 
 #include "cocos2d.h"
 #include "../cocos/ui/CocosGUI.h"
@@ -7,12 +7,16 @@
 using namespace cocos2d::ui;
 using namespace cocos2d;
 
-class HelloWorld : public cocos2d::Layer
+class ColorPattern : public cocos2d::Layer
 {
 private:
     
+    Node* n;
     RenderTexture* target;
     Sprite* brush;
+    ClippingNode* clipper;
+    
+    void bPatternClick(Ref* ref);
     
     bool onTouchBegan(Touch* touch, Event* events);
     void onTouchMoved(Touch* touch, Event* events);
@@ -25,7 +29,7 @@ public:
     virtual bool init();
 
     // implement the "static create()" method manually
-    CREATE_FUNC(HelloWorld);
+    CREATE_FUNC(ColorPattern);
 };
 
 #endif // __HELLOWORLD_SCENE_H__
