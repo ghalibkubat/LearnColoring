@@ -14,7 +14,11 @@ private:
     Node* n;
     RenderTexture* target;
     Sprite* brush;
+	Sprite* stencil;
     ClippingNode* clipper;
+	std::string texture = "res/HelloWorld.png";
+	LayerColor* l;
+	Node* _nodeStencil;
     
     void bPatternClick(Ref* ref);
     

@@ -33,30 +33,31 @@ bool ColorPattern::init()
     Size visibleSize = Director::getInstance()->getVisibleSize();
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
     
-    auto stencil = Sprite::create("gambar/brush.png");
+    //stencil = Sprite::create("gambar/brush.png");
     //stencil->setScale(5);
     //stencil->setColor(Color3B(255, 0, 0));
-    
-    n = Node::create();
-    n->retain();
+	l = LayerColor::create(Color4B(0, 0, 0, 0));
+	this->addChild(l);
+
+	_nodeStencil = Node::create();
     
     clipper = ClippingNode::create();
     clipper->setAnchorPoint(Vec2(0.5, 0.5));
     //clipper->setPosition(Vec2(visibleSize.width/2, visibleSize.height/2));
     clipper->setAlphaThreshold(0.05f);
-    clipper->setStencil(stencil);
+    clipper->setStencil(_nodeStencil);
     
-    n->addChild(clipper);
+    l->addChild(clipper);
     
     brush = Sprite::create("res/HelloWorld.png");
     brush->setPosition(Vec2(960/2, 640/2));
     clipper->addChild(brush);
     
-    target = RenderTexture::create(visibleSize.width, visibleSize.height, Texture2D::PixelFormat::RGBA8888, GL_DEPTH24_STENCIL8);
+    /*target = RenderTexture::create(visibleSize.width, visibleSize.height, Texture2D::PixelFormat::RGBA8888, GL_DEPTH24_STENCIL8);
     target->setPosition(Vec2(visibleSize.width/2, visibleSize.height/2));
     target->retain();
     
-    this->addChild(target);
+    this->addChild(target);*/
     
     auto bkuning = Button::create("pattern/paint_a.png");
     auto warnakuning = Sprite::create("pattern/paint_b.png");
@@ -93,6 +94,21 @@ bool ColorPattern::init()
 void ColorPattern::bPatternClick(cocos2d::Ref *ref)
 {
     auto b = (Button*) ref;
+
+	_nodeStencil = Node::create();
+
+	clipper = ClippingNode::create();
+	clipper->setAnchorPoint(Vec2(0.5, 0.5));
+	//clipper->setPosition(Vec2(visibleSize.width/2, visibleSize.height/2));
+	clipper->setAlphaThreshold(0.05f);
+	clipper->setStencil(_nodeStencil);
+
+	l->addChild(clipper);
+
+	brush = Sprite::create("res/HelloWorld.png");
+	brush->setPosition(Vec2(960 / 2, 640 / 2));
+	clipper->addChild(brush);
+
     if(b->getTag() == 0)
         brush->setTexture("pattern/3.png");
     else if(b->getTag()==1)
@@ -101,18 +117,26 @@ void ColorPattern::bPatternClick(cocos2d::Ref *ref)
 
 bool ColorPattern::onTouchBegan(cocos2d::Touch *touch, cocos2d::Event *events)
 {
-    Vec2 start = touch->getLocation();
-    Vec2 delta = Vec2(960/2, 640/2) - start;
+	Vec2 start = touch->getLocation();
+	Vec2 delta = start;
     
     cocos2d::log("touch x:%f, y:%f", start.x, start.y);
     cocos2d::log("delta x:%f, y:%f", delta.x, delta.y);
     
-    target->begin();
-    n->setPosition(start);
-    brush->setPosition(delta);
-    n->visit();
+    //target->begin();
+    //n->setPosition(start);
+    //brush->setPosition(delta);
+    //n->visit();
     
-    target->end();
+    //target->end();
+
+	auto na = Node::create();
+	//n->retain();
+	l->addChild(na);
+
+	auto st = Sprite::create("gambar/brush.png");
+	st->setPosition(delta);
+	_nodeStencil->addChild(st);
     
     return true;
 }
@@ -144,18 +168,21 @@ void ColorPattern::onTouchMoved(cocos2d::Touch *touch, cocos2d::Event *events)
     target->end();*/
     
     Vec2 start = touch->getLocation();
-    Vec2 delta = Vec2(960/2, 640/2) - start;
+    Vec2 delta = start;
     
     cocos2d::log("touch x:%f, y:%f", start.x, start.y);
     cocos2d::log("delta x:%f, y:%f", delta.x, delta.y);
     
-    target->begin();
-    n->setPosition(start);
-    brush->setPosition(delta);
-    n->visit();
+    //target->begin();
+    //n->setPosition(start);
+    //brush->setPosition(delta);
+    //n->visit();
     
-    target->end();
+    //target->end();
     
+	auto st = Sprite::create("gambar/brush.png");
+	st->setPosition(delta);
+	_nodeStencil->addChild(st);
 }
 
 void ColorPattern::onTouchEnded(cocos2d::Touch *touch, cocos2d::Event *events)

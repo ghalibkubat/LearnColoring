@@ -1,6 +1,7 @@
 #include "AppDelegate.h"
 #include "HelloWorldScene.h"
 #include "ColorPattern.h"
+#include "Painting.h"
 
 USING_NS_CC;
 
@@ -67,7 +68,8 @@ bool AppDelegate::applicationDidFinishLaunching() {
     // create a scene. it's an autorelease object
     //auto scene = Splash::createScene();
     //auto scene = HelloWorld::createScene();
-    auto scene = ColorPattern::createScene();
+    //auto scene = ColorPattern::createScene();
+	auto scene = Painting::createScene();
     
     // run
     director->runWithScene(scene);
