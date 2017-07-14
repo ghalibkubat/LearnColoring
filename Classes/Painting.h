@@ -14,10 +14,14 @@ private:
 	ClippingNode* clipper;
 	std::string texture = "res/HelloWorld.png";
 	LayerColor* l;
-	Node* _nodeStencil;
+	SpriteBatchNode* _nodeStencil;
+	SpriteBatchNode* batch;
 	bool isPen = true;
 	Color3B penColor = Color3B::BLACK;
 
+	bool isChange = false;
+	int state = 0;
+	
 	void bPatternClick(Ref* ref);
 
 	bool onTouchBegan(Touch* touch, Event* events);

@@ -58,7 +58,9 @@ bool Painting::init()
 	l->setPosition(- clip->getPosition());
 	clip->addChild(l);
 
-	_nodeStencil = Node::create();
+	_nodeStencil = SpriteBatchNode::create("gambar/brush.png");
+	batch = SpriteBatchNode::create("gambar/brush.png");
+	l->addChild(batch);
 
 	clipper = ClippingNode::create();
 	clipper->setAnchorPoint(Vec2(0.5, 0.5));
@@ -133,38 +135,47 @@ bool Painting::init()
 void Painting::bPatternClick(cocos2d::Ref *ref)
 {
 	auto b = (Button*)ref;
-	Size visibleSize = Director::getInstance()->getVisibleSize();
 
-	if (b->getTag() < 2) {
-		_nodeStencil = Node::create();
-
-		clipper = ClippingNode::create();
-		clipper->setAnchorPoint(Vec2(0.5, 0.5));
-		//clipper->setPosition(Vec2(visibleSize.width/2, visibleSize.height/2));
-		clipper->setAlphaThreshold(0.05f);
-		clipper->setStencil(_nodeStencil);
-
-		l->addChild(clipper);
-
-		brush = Sprite::create("res/HelloWorld.png");
-		brush->setPosition(Vec2(visibleSize.width / 2, visibleSize.height / 2));
-		clipper->addChild(brush);
-
-		if (b->getTag() == 0)
-			brush->setTexture("pattern/3.png");
-		else if (b->getTag() == 1)
-			brush->setTexture("pattern/2.png");
-		isPen = false;
-	}
-	else {
-		isPen = true;
-		if (b->getTag() == 2) penColor = Color3B::RED;
-		else if (b->getTag() == 3) penColor = Color3B::GREEN;
-	}
+	state = b->getTag();
+	isChange = true;
 }
 
 bool Painting::onTouchBegan(cocos2d::Touch *touch, cocos2d::Event *events)
 {
+	Size visibleSize = Director::getInstance()->getVisibleSize();
+	if (isChange) {
+		if (state < 2) {
+			_nodeStencil = SpriteBatchNode::create("gambar/brush.png");
+
+			clipper = ClippingNode::create();
+			clipper->setAnchorPoint(Vec2(0.5, 0.5));
+			//clipper->setPosition(Vec2(visibleSize.width/2, visibleSize.height/2));
+			clipper->setAlphaThreshold(0.05f);
+			clipper->setStencil(_nodeStencil);
+
+			l->addChild(clipper);
+
+			brush = Sprite::create("res/HelloWorld.png");
+			brush->setPosition(Vec2(visibleSize.width / 2, visibleSize.height / 2));
+			clipper->addChild(brush);
+
+			if (state == 0)
+				brush->setTexture("pattern/3.png");
+			else if (state == 1)
+				brush->setTexture("pattern/2.png");
+			isPen = false;
+		}
+		else {
+			batch = SpriteBatchNode::create("gambar/brush.png");
+			l->addChild(batch);
+			isPen = true;
+			if (state == 2) penColor = Color3B::RED;
+			else if (state == 3) penColor = Color3B::GREEN;
+		}
+
+		isChange = false;
+	}
+
 	Vec2 start = touch->getLocation();
 	Vec2 delta = start;
 
@@ -177,13 +188,21 @@ bool Painting::onTouchBegan(cocos2d::Touch *touch, cocos2d::Event *events)
 	//n->visit();
 
 	//target->end();
+	if (!isPen) {
+		float w = _nodeStencil->getTextureAtlas()->getTexture()->getPixelsWide() / CC_CONTENT_SCALE_FACTOR();
+		float h = _nodeStencil->getTextureAtlas()->getTexture()->getPixelsHigh() / CC_CONTENT_SCALE_FACTOR();
+		Rect r = Rect(0, 0, w, h);
+		auto st = Sprite::createWithTexture(_nodeStencil->getTexture(), r);
 
-	auto st = Sprite::create("gambar/brush.png");
-	st->setPosition(start);
-	if (!isPen) _nodeStencil->addChild(st);
+		_nodeStencil->addChild(st);
+	}
 	else {
+		float w = batch->getTextureAtlas()->getTexture()->getPixelsWide() / CC_CONTENT_SCALE_FACTOR();
+		float h = batch->getTextureAtlas()->getTexture()->getPixelsHigh() / CC_CONTENT_SCALE_FACTOR();
+		Rect r = Rect(0, 0, w, h);
+		auto st = Sprite::createWithTexture(batch->getTexture(), r);
 		st->setColor(penColor);
-		l->addChild(st);
+		batch->addChild(st);
 	}
 
 	return true;
@@ -225,13 +244,26 @@ void Painting::onTouchMoved(cocos2d::Touch *touch, cocos2d::Event *events)
 
 	//target->end();
 
-	auto st = Sprite::create("gambar/brush.png");
-	st->setPosition(start);
-	if (!isPen) _nodeStencil->addChild(st);
-	else {
-		st->setColor(penColor);
-		l->addChild(st);
+	Sprite* s;
+
+	if (!isPen) {
+		float w = _nodeStencil->getTextureAtlas()->getTexture()->getPixelsWide() / CC_CONTENT_SCALE_FACTOR();
+		float h = _nodeStencil->getTextureAtlas()->getTexture()->getPixelsHigh() / CC_CONTENT_SCALE_FACTOR();
+		Rect r = Rect(0, 0, w, h);
+		s = Sprite::createWithTexture(_nodeStencil->getTexture(), r);
+
+		_nodeStencil->addChild(s);
 	}
+	else {
+		float w = batch->getTextureAtlas()->getTexture()->getPixelsWide() / CC_CONTENT_SCALE_FACTOR();
+		float h = batch->getTextureAtlas()->getTexture()->getPixelsHigh() / CC_CONTENT_SCALE_FACTOR();
+		Rect r = Rect(0, 0, w, h);
+		s = Sprite::createWithTexture(batch->getTexture(), r);
+		s->setColor(penColor);
+		batch->addChild(s);
+	}
+
+	s->setPosition(start);
 
 	float distance = start.getDistance(end);
 	if (distance > 1) {
@@ -243,13 +275,26 @@ void Painting::onTouchMoved(cocos2d::Touch *touch, cocos2d::Event *events)
 			float dify = end.y - start.y;
 			float delta = (float)(i * 5) / distance;
 
-			auto st = Sprite::create("gambar/brush.png");
-			st->setPosition(Vec2(start.x + (difx * delta), start.y + (dify * delta)));
-			if (!isPen) _nodeStencil->addChild(st);
-			else {
-				st->setColor(penColor);
-				l->addChild(st);
+			Sprite* st;
+
+			if (!isPen) {
+				float w = _nodeStencil->getTextureAtlas()->getTexture()->getPixelsWide() / CC_CONTENT_SCALE_FACTOR();
+				float h = _nodeStencil->getTextureAtlas()->getTexture()->getPixelsHigh() / CC_CONTENT_SCALE_FACTOR();
+				Rect r = Rect(0, 0, w, h);
+				st = Sprite::createWithTexture(_nodeStencil->getTexture(), r);
+
+				_nodeStencil->addChild(st);
 			}
+			else {
+				float w = batch->getTextureAtlas()->getTexture()->getPixelsWide() / CC_CONTENT_SCALE_FACTOR();
+				float h = batch->getTextureAtlas()->getTexture()->getPixelsHigh() / CC_CONTENT_SCALE_FACTOR();
+				Rect r = Rect(0, 0, w, h);
+				st = Sprite::createWithTexture(batch->getTexture(), r);
+				st->setColor(penColor);
+				batch->addChild(st);
+			}
+
+			st->setPosition(Vec2(start.x + (difx * delta), start.y + (dify * delta)));
 		}
 	}
 }
